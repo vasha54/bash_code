@@ -1,6 +1,8 @@
 #!/bin/bash
-# @author: Luis Andrés Valido Fajardo luis.valido.umcc.cu 
-# Script para realizar una salva de la BD 
+# @author: Luis Andrés Valido Fajardo luis.valido1989@gmail.com +53 53694742
+# Script para realizar una salva de la BD al cual se le pasa por parametros 
+# IP de la base de datos, nombre de la base datos, usuario y password para la
+# conexion a la base datos
 
 #Directorio donde se va hacer una salva
 path_parent_store="/opt/salva"
@@ -42,10 +44,11 @@ if [ ! -d $path_log ]
 	then
 		mkdir $path_log
 		chmod 777 -R $path_log
-		echo Creando directorio de logs >> $path_log/$file_log
+		echo Creating log directory >> $path_log/$file_log
 	fi	
 	
-	
+# Combrobando que existe el comando mysqldump instalado en el sistema que 
+# permita volcar la BD en un fichero	
 if ! command -v mysqldump &> /dev/null
 then
     echo "mysqldump could not be found"
@@ -55,7 +58,7 @@ fi
 
 #Verificar si se ha proporcionado los parámetros esperados:
 if [ $# -ne 4 ]; then
-	echo No fueron proporcionado los parametros necesarios >> $path_log/$file_log
+	echo The necessary parameters were not provided >> $path_log/$file_log
 	exit 1
 fi
 
@@ -67,11 +70,11 @@ password=$4
 
 
 #Se registra en el log el inicio del proceso de salva
-echo +++Se inicio el proceso de salva+++ >> $path_log/$file_log
+echo +++The save process began+++ >> $path_log/$file_log
 #-------------Inicio del proceso de la salva de la BD del moodle---------------
 
 #Se registra en el log el inicio del proceso de salva de la BD
-echo ---Inicio del proceso de la salva de la BD--- >> $path_log/$file_log
+echo ---Start of the DB save process--- >> $path_log/$file_log
 
 #Creando el directorio donde se salva la BD en caso que no este creado
 #el mismo
@@ -79,12 +82,12 @@ if [ ! -d $backup_path_database ]
 	then
 		mkdir $backup_path_database
 		chmod 777 -R $backup_path_database
-		echo Creando directorio de salva de las BD >> $path_log/$file_log
+		echo Creating DB save directory >> $path_log/$file_log
 	fi
 # Cambiando los permisos del fichero donde se va volcar la BD del moodle. 
 umask 777
 
-echo Salvando la BD en $backup_path_database/$db_name-$date.sql >> $path_log/$file_log
+echo Saving the DB in $backup_path_database/$db_name-$date.sql >> $path_log/$file_log
 
 #Volcando la BD del Moodle en el fichero 
 
@@ -95,24 +98,24 @@ else
     echo 'Comando mysqldump fallo en su ejecuccion' >> $path_log/$file_log
 fi
 
-echo Fin de la salva de la BD en $backup_path_database/$db_name-$date.sql >> $path_log/$file_log
+echo End of database save process $backup_path_database/$db_name-$date.sql >> $path_log/$file_log
 
 #Compruebo que el archivo creado no esta vacio para no eliminar 
 #las salvas anteiores 
 if [ -s $backup_path_database/$db_name-$date.sql ]; then
         # La salva genero un archivo no vacio.
-        echo Eliminado salva de BD viejas >> $path_log/$file_log
+        echo Deleted saves from old databases >> $path_log/$file_log
         
         #Eliminando salvas de la BD del moodle con más días que el valor definido en 
         #la variable maximun_days_store.
         find $backup_path_database/*.sql -mtime +$maximun_days_store -exec rm {} \; 
 else
         # La salva genero un archivo vacio.
-        echo 'Se genero un archivo .sql vacio' >> $path_log/$file_log
+        echo 'An empty .sql file was generated' >> $path_log/$file_log
 fi
 
-echo ---Fin del proceso de la salva de la BD--- >> $path_log/$file_log
+echo ---End of the DB save process--- >> $path_log/$file_log
 #-------------Fin del proceso de la salva de la BD-------------------
 
 #Se registra en el log el fin del proceso de salva
-echo +++Se termino el proceso de salva TODO FRES@!!!!!!!+++ >> $path_log/$file_log
+echo +++The save process is finished !!!!!!!+++ >> $path_log/$file_log
